@@ -1,0 +1,126 @@
+//Adapated from DinoDevs everwing extension
+//NOTE: Do not change these values a lot of them will result in
+//the game not saving your coins when you die
+//These values are at the limit of what everwing will accept for the most part
+//and making them better will create errors
+//You CAN change the extra lives variable, however.
+
+//When starting the game:
+//1. Clone your sidekicks
+//2. Give permanent double shot
+//3. Give 5 extra Lives
+//4. Make the player shoot fasters
+var onStart = function() {
+  window.GC.app.gameModel.cloneSidekicks(10000000000);
+
+  window.GC.app.gameModel.doubleShotTimer.active = true;
+  window.GC.app.gameModel.doubleShotTimer.duration = 1e+10;
+  window.GC.app.gameModel.doubleShotTimer.elasped = 1e+10;
+
+	//You may change this
+  window.GC.app.gameModel.extraLives = 5;
+
+
+  window.GC.app.gameModel.player.shootTimeout = 50;
+}
+
+//New loot table
+//90% of dropping coins
+//10% chance of dropping diamonds
+var weights = {
+  amethyst: 0,
+  bulletLevel: 0,
+  coin: 0.9,
+  deathRush: 0,
+  diamond: 0.1,
+  doubleShot: 0,
+  energy: 0,
+  laser: 0,
+  magnet: 0,
+  ruby: 0,
+  rush: 0,
+  slow: 0
+};
+var sidekick;
+
+//Give your sidekicks a bunch of extra skills
+for (var i = 0; i < window.GC.app.gameModel.sidekicks.models.length; i++) {
+  sidekick = window.GC.app.gameModel.sidekicks.models[i];
+  sidekick.skills.magnet = 1;
+  sidekick.skills.homing = 1;
+  sidekick.skills.bossKiller = 1;
+  sidekick.skills.snowCone = 1;
+  sidekick.skills.spreadShot = 1;
+  sidekick.skills.charm = 1;
+  sidekick.skills.poison = 1;
+}
+
+//Make your sidekicks shoot faster and harder
+for (var i = 0; i < window.GC.app.gameModel.sidekicks.models.length; i++) {
+  sidekick = window.GC.app.gameModel.sidekicks.models[i];
+  if (this.damage >= 0)
+    sidekick.damage = 1000;
+  if (this.level >= 0)
+    sidekick.bulletLevel = 40;
+  if (this.speed >= 0)
+    sidekick.shootTimeout = 40;
+}
+
+var enteredGame = false;
+
+
+//Every 100ms, execute this code:
+var interval = window.setInterval(function() {
+
+
+	//When the game starts run the start game function
+	if (!window.GC.app.gameModel.gameStarted) {
+  } else if (window.GC.app.gameModel.gameOver) {
+		enteredGame = false;
+	} else {
+    if(enteredGame == false) {
+			onStart();
+			enteredGame = true;
+		}
+  };
+
+
+
+
+	//Remove all meteors
+  for (var i = window.GC.app.gameModel.meteors._pool._models.length - 1; i >= 0; i--) {
+    window.GC.app.gameModel.meteors._pool._models[i].health = 0;
+  }
+
+
+	//Make the game run at 3x speed. Values 1-4 should work fine
+  window.GC.app.gameModel.timeMult = 3;
+
+	//Give the player a permanent magnet ability
+  window.GC.app.gameModel.player.magnetReach = 500;
+
+	//Each time the player kills a boss, make them do more damage
+  var bk = window.GC.app.gameModel.bossesKilled;
+  window.GC.app.gameModel.player.damage = 1000* ((bk + 2)/2);
+  for (var i = 0; i < window.GC.app.gameModel.sidekicks.models.length; i++) {
+    sidekick = window.GC.app.gameModel.sidekicks.models[i];
+    if (this.damage >= 0)
+      sidekick.damage = ((bk + 2)/2) * 250;
+  }
+
+	//Implement the loot drops specified above in the weights variable
+  for (name in this.weights) {
+    if (this.weights.hasOwnProperty(name)) {
+      window.GC.app.gameModel.items.spawnChances[name] = this.weights[name];
+    }
+  }
+
+
+//Make all found eggs ancient eggs, the rarest type
+  if (window.GC.app.gameModel.eggFound != null) {
+    window.GC.app.gameModel.eggFound.id = "ancient";
+  }
+
+
+
+}, 100);
