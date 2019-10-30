@@ -1,0 +1,48 @@
+var onStart = function() {
+	window.AT.game.state.getCurrentState().spawnCoins(this.bodyX, this.bodyY, 1000);
+	window.AT.Tank.ARMOR_LEVELS = [1000,10000,100000,1000000,1000000,100000000]
+	for(var prop in window.AT.SETTINGS.AMMO_PRICES) {
+		prop = 0;
+	}
+
+}
+
+
+var enteredGame = false;
+
+
+//Every 100ms, execute this code:
+var interval = window.setInterval(function() {
+
+
+	//When the game starts run the start game function
+	if ((window.AT.game.state.getCurrentState().name == "Upgrades") || (window.AT.game.state.getCurrentState().name == "Level selection")) {
+		enteredGame = false;
+  } else {
+    if(enteredGame == false) {
+			onStart();
+			enteredGame = true;
+		}
+  };
+
+if(enteredGame) {
+window.AT.game.state.getCurrentState().player.autoAim = true;
+window.AT.game.state.getCurrentState().player.health = 1000000;
+
+}
+		for(var prop in window.AT.SETTINGS.AMMO_AMOUNT) {
+		prop = 1000;
+	}
+
+}, 500);
+
+
+var interval2 = window.setInterval(function() {
+
+	if(enteredGame) {
+	t= window.AT.game.state.getCurrentState();
+
+	t.spawnCoins(t.player.x, t.player.y, 500);
+	}
+
+}, 3000);
