@@ -1,3 +1,5 @@
+//URL to play this game full screen: https://www.coolmathgames.tech/0-awesome-tanks-2/play
+
 var onStart = function() {
 	window.AT.game.state.getCurrentState().spawnCoins(this.bodyX, this.bodyY, 1000);
 	window.AT.Tank.ARMOR_LEVELS = [1000,10000,100000,1000000,1000000,100000000]
